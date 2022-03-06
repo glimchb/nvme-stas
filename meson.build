@@ -32,6 +32,9 @@ want_html = get_option('html')
 # Check for libnvme availability
 libnvme_dep = dependency('libnvme', fallback : ['libnvme', 'libnvme_dep'])
 
+# Check for spdk availability
+spdk_dep = dependency('spdk', fallback : ['spdk', 'spdk_dep'])
+
 # Check that we have all the right Python3 dependencies
 python3 = import('python').find_installation('python3')
 python_version = python3.language_version()
