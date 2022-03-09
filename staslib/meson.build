@@ -14,7 +14,7 @@ defs_py = configure_file(
 )
 
 configured_files   = [ defs_py ]
-unconfigured_files = [ '__init__.py', 'avahi.py', 'glibudev.py', 'stas.py' ]
+unconfigured_files = [ '__init__.py', 'avahi.py', 'glibudev.py', 'stas.py', 'conf.py' ]
 
 python3.install_sources(
     unconfigured_files + configured_files,
