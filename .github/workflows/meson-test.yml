@@ -34,3 +34,37 @@ jobs:
 #          path: |
 #            ${{ github.workspace }}/.build/meson-logs/*.txt
 
+  build-disto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install requirements
+        run: |
+          sudo apt-get install -y meson docbook-xml docbook-xsl xsltproc libjson-c-dev libglib2.0-dev libgirepository1.0-dev libsystemd-dev python3-systemd python3-pyudev python3-lxml
+          python3 -m pip install --upgrade pip wheel
+          python3 -m pip install --upgrade dasbus pylint pyflakes PyGObject
+      - name: Build RPM and Deb
+        run: make rpm deb
+
+  code-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install requirements
+        run: |
+          sudo apt-get install -y lcov meson libjson-c-dev libglib2.0-dev libgirepository1.0-dev libsystemd-dev python3-systemd python3-pyudev python3-lxml
+          python3 -m pip install --upgrade pip wheel
+          python3 -m pip install --upgrade dasbus pylint pyflakes PyGObject
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+      - uses: BSFishy/meson-build@v1.0.3
+        with:
+          setup-options: -Db_coverage=true --werror
+          options: --verbose
+          # Can't use 'coverage' here, see https://github.com/BSFishy/meson-build/issues/4
+          action: test
+      - name: Generate Coverage Report
+        # Can't use meson here, see https://github.com/mesonbuild/meson/issues/7895
+        run: ninja -C build coverage --verbose
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false
