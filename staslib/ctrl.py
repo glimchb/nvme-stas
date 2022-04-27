@@ -215,6 +215,25 @@ class Controller:  # pylint: disable=too-many-instance-attributes
     def _on_connect_fail(self, op_obj, err, fail_cnt):  # pylint: disable=unused-argument
         '''@brief Function called when we fail to connect to the Controller.'''
         op_obj.kill()
+
+        # TODO: SPDK code
+        import requests
+        import json
+        data = {"id": 1, "method": "bdev_get_bdevs", "params": {"name": "Malloc0"}}
+        #data = {"id": 1, "method": "bdev_nvme_attach_controller", "params": {"name": "Nvme0", "trtype": "RDMA", "traddr": "172.20.165.200", "subnqn": "testsubsystem", "trsvcid": "1023", "adrfam": "ipv4"}}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        try:
+            r = requests.post("http://127.0.0.1:9009", data=json.dumps(data), headers=headers, auth=('spdkuser', 'spdkpass'))
+            logging.error(
+                'xxxxxxBORISxxxx - %s. SPDK says : %s : %s',
+                self.id,
+                r.status_code,
+                r.json(),
+            )
+        except:
+            pass
+        # TODO: SPDK code
+
         if self._alive():
             if self._connect_attempts == 1:
                 # Do a fast re-try on the first failure.

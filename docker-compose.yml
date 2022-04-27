@@ -14,6 +14,7 @@ x-stas: &default-stas
     volumes:
         - /run/dbus:/run/dbus
         - /etc/nvme:/etc/nvme
+        - ./etc/stas/stafd.conf:/etc/stas/stafd.conf
     privileged: true
     network_mode: host
 
@@ -24,11 +25,30 @@ services:
       RUNTIME_DIRECTORY: /run/stafd
       XDG_CACHE_HOME: /var/cache/stafd
       PYTHONUNBUFFERED: 1
-    command: -u /usr/sbin/stafd
+    command: -u /usr/sbin/stafd --tron
   stacd:
     <<: *default-stas
     environment:
       RUNTIME_DIRECTORY: /run/stacd
       XDG_CACHE_HOME: /var/cache/stacd
       PYTHONUNBUFFERED: 1
-    command: -u /usr/sbin/stacd
+    command: -u /usr/sbin/stacd --tron
+
+  spdk:
+    build:
+      context: .
+      dockerfile: Dockerfile.spdk
+    volumes:
+      - /dev/hugepages:/dev/hugepages
+      - /dev/shm:/dev/shm
+      - /proc:/proc
+    privileged: true
+    network_mode: host
+    command: |
+      sh -c 'echo 2048 > /proc/sys/vm/nr_hugepages && \
+            /root/spdk/build/bin/spdk_tgt -m 0x1 -s 1024 > /tmp/spdk-tgt.log 2>&1 & \
+            echo wait 5s... && sleep 5s && cd /root/spdk/scripts && \
+            ./rpc.py bdev_malloc_create -b Malloc0 64 512 && \
+            ./rpc.py bdev_malloc_create -b Malloc1 64 512 && \
+            ./rpc_http_proxy.py 0.0.0.0 9009 spdkuser spdkpass'
+
