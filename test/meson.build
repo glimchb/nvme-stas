@@ -53,6 +53,8 @@ things_to_test = [
     ['Test Service',       'test-service.py',      ['pyfakefs']],
     ['Test Udev',          'test-udev.py',         []],
     ['Test TransportId',   'test-transport_id.py', []],
+    ['Test Finder',        'test-stafd.py',        ['pyfakefs']],
+    ['Test Connector',     'test-stacd.py',        ['pyfakefs']],
 ]
 
 foreach thing: things_to_test

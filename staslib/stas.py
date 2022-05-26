@@ -48,7 +48,7 @@ def check_if_allowed_to_continue():
     '''
     # 1) Check root privileges
     if os.geteuid() != 0:
-        sys.exit(f'Permission denied. You need root privileges to run {os.path.basename(sys.argv[0])}.')
+        print(f'Permission denied. You need root privileges to run {os.path.basename(sys.argv[0])}.')
 
     # 2) Check that nvme-tcp kernel module is running
     if not os.path.exists('/dev/nvme-fabrics'):
